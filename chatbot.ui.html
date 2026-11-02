@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>Vesper.ai</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cg transform='rotate(-30 12 12)'%3E%3Ccircle cx='7.3' cy='3.2' r='1.45'/%3E%3Crect x='5.5' y='4.7' width='3.6' height='14.6' rx='1.8'/%3E%3Crect x='14.9' y='4.7' width='3.6' height='14.6' rx='1.8'/%3E%3Ccircle cx='16.7' cy='20.8' r='1.45'/%3E%3C/g%3E%3C/svg%3E">
+  <style>
+    html, body { background: #000000 !important; color: #ffffff; }
+    :root { color-scheme: dark; --bg: #000000; --text: #ffffff; }
+    html, body { background: #000000; background: var(--bg, #000000); color: #ffffff; color: var(--text, #ffffff); }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body { position: relative; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+    .backdrop { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #000; }
+    .backdrop video { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .wordmark { position: fixed; z-index: 2; top: max(28px, env(safe-area-inset-top)); left: max(32px, env(safe-area-inset-left)); color: #fff; font: 600 16px/1 Inter, system-ui, sans-serif; letter-spacing: -.035em; text-shadow: 0 2px 16px rgba(0,0,0,.55); }
+    .quote-line { position: fixed; z-index: 1; top: 43%; left: 50%; width: min(900px, calc(100vw - 48px)); transform: translate(-50%,-50%); color: rgba(255,255,255,.94); text-align: center; font: 400 clamp(18px, 2.2vw, 27px)/1.35 Inter, system-ui, sans-serif; letter-spacing: -.025em; text-shadow: 0 2px 24px rgba(0,0,0,.75), 0 0 42px rgba(0,0,0,.45); opacity: 1; transition: opacity .45s ease, transform .45s ease; pointer-events: none; }
+    .quote-line.is-changing { opacity: 0; }
+    body.chat-active .quote-line { top: 30px; width: min(650px, calc(100vw - 230px)); transform: translateX(-50%); color: rgba(255,255,255,.82); font-size: 13px; letter-spacing: .005em; }
+    .conversation { display: none; position: fixed; z-index: 1; top: 88px; bottom: 120px; left: 50%; transform: translateX(-50%); width: min(820px, calc(100vw - 40px)); padding: 24px 22px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.22) transparent; border: 1px solid rgba(255,255,255,.14); border-radius: 22px; background: rgba(4,5,7,.16); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%); }
+    body.chat-active .conversation { display: block; }
+    .conversation::-webkit-scrollbar { width: 5px; }
+    .conversation::-webkit-scrollbar-thumb { background: rgba(255,255,255,.22); border-radius: 5px; }
+    .messages { display: flex; flex-direction: column; gap: 18px; min-height: 100%; justify-content: flex-end; }
+    .message-row { display: flex; width: 100%; }
+    .message-row.user { justify-content: flex-end; }
+    .message-row.assistant { justify-content: flex-start; }
+    .bubble { max-width: min(78%, 620px); padding: 13px 16px; border: 1px solid rgba(255,255,255,.16); border-radius: 16px; color: rgba(255,255,255,.96); font: 400 15px/1.55 Inter, system-ui, sans-serif; letter-spacing: -.01em; white-space: pre-wrap; overflow-wrap: anywhere; text-shadow: 0 1px 10px rgba(0,0,0,.4); }
+    .assistant .bubble { border-top-left-radius: 5px; background: rgba(7,8,10,.32); }
+    .user .bubble { border-color: rgba(255,255,255,.2); border-top-right-radius: 5px; background: rgba(255,255,255,.14); }
+    .typing .bubble { color: rgba(255,255,255,.66); font-size: 13px; }
+    .chat-dock { position: fixed; z-index: 2; left: 50%; bottom: max(38px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(680px, calc(100vw - 48px)); height: 66px; display: flex; align-items: center; gap: 12px; padding: 8px 9px 8px 21px; border: 1px solid rgba(255,255,255,.25); border-radius: 18px; background: rgba(5,5,7,.20); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 12px 48px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.09); transition: border-color .25s ease, background .25s ease, box-shadow .25s ease; }
+    .chat-dock:focus-within { border-color: rgba(255,255,255,.46); background: rgba(5,5,7,.14); box-shadow: 0 12px 52px rgba(0,0,0,.24), 0 0 28px rgba(255,255,255,.08), inset 0 1px 0 rgba(255,255,255,.13); }
+    .message { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: #fff; font: 400 16px/1.4 Inter, system-ui, sans-serif; caret-color: #fff; }
+    .message::placeholder { color: rgba(255,255,255,.58); }
+    .send { width: 46px; height: 46px; flex: 0 0 46px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.21); border-radius: 13px; background: rgba(255,255,255,.10); color: white; cursor: pointer; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+    .send:hover { background: rgba(255,255,255,.19); border-color: rgba(255,255,255,.4); }
+    .send:active { transform: scale(.96); }
+    .send:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+    .send svg { width: 19px; height: 19px; }
+    @media (max-width: 560px) { .wordmark { top: max(22px, env(safe-area-inset-top)); left: max(20px, env(safe-area-inset-left)); } .quote-line { top: 42%; width: calc(100vw - 40px); font-size: 18px; } body.chat-active .quote-line { top: max(24px, env(safe-area-inset-top)); left: auto; right: 20px; transform: none; width: calc(100vw - 150px); font-size: 11px; } .conversation { top: 72px; bottom: 94px; width: calc(100vw - 20px); padding: 18px 13px; border-radius: 18px; } .bubble { max-width: 90%; padding: 11px 13px; font-size: 14px; } .chat-dock { width: calc(100vw - 32px); bottom: max(20px, env(safe-area-inset-bottom)); height: 60px; border-radius: 16px; padding-left: 17px; } .send { width: 42px; height: 42px; flex-basis: 42px; border-radius: 12px; } }
+    @media (prefers-reduced-motion: reduce) { .chat-dock, .send { transition: none !important; } }
+  </style>
+</head>
+<body style="background:#000;color:#fff">
+  <div class="backdrop" aria-hidden="true">
+    <video id="hero-motion" autoplay muted loop playsinline preload="auto" disablepictureinpicture>
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260818_072341_50851634-bbc3-4c33-9acc-7647d4db44aa.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="wordmark" aria-label="trinty">trinty</div>
+  <div class="quote-line" aria-live="polite">Ready when you are.</div>
+  <section class="conversation" aria-label="Conversation" aria-live="polite">
+    <div class="messages" id="messages"></div>
+  </section>
+  <form class="chat-dock" aria-label="Send a message" autocomplete="off">
+    <input class="message" type="text" aria-label="Message" placeholder="Message Trinty..." autocomplete="off" spellcheck="true" maxlength="2000">
+    <button class="send" type="submit" aria-label="Send message">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 10h13M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </form>
+  <script type="module" src="./chatbot.ui.js"></script>
+</body>
+</html>
+
