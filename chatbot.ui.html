@@ -101,24 +101,35 @@
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     @media (max-width: 560px) { .header-actions { top: max(15px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); gap: 5px; } .header-button { min-height: 34px; padding: 0 9px; font-size: 10px; } .quick-start { top: 53%; width: calc(100vw - 30px); gap: 7px; } .prompt-chip { padding: 9px 11px; font-size: 10px; } .side-panel { padding-left: 17px; padding-right: 17px; } }
 
-    .mascot-motion { position: absolute; z-index: 5; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none; }
-    .mascot-character { position: absolute; left: 48px; top: 8px; width: 44px; height: 52px; transform-origin: 50% 82%; }
-    .mascot-image { display: block; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.36); border-radius: 50%; object-fit: cover; image-rendering: pixelated; box-shadow: 0 2px 10px rgba(0,0,0,.38); }
-    .mascot-tool { display: none; position: absolute; z-index: 1; top: -4px; right: -4px; width: 21px; height: 29px; transform-origin: 65% 80%; filter: drop-shadow(0 1px 2px rgba(0,0,0,.42)); }
-    .mascot-laddoo { position: absolute; z-index: 2; top: 33px; left: 27px; display: block; width: 9px; height: 9px; border: 1px solid rgba(107,48,16,.78); border-radius: 50%; background: radial-gradient(circle at 32% 28%, #ffe49a 0 16%, #e5a44a 34%, #c56b2f 100%); box-shadow: 0 1px 4px rgba(0,0,0,.45); animation: laddoo-bite 2.4s ease-in-out infinite; }
-    .mascot-laddoo::after { content: ""; position: absolute; top: 2px; left: 3px; width: 1px; height: 1px; border-radius: 50%; background: #fff0c6; box-shadow: 3px 2px 0 #fff0c6, 1px 4px 0 rgba(255,245,218,.9); }
-    .mascot-motion[data-state="idle"] .mascot-character { animation: mascot-idle 2.4s ease-in-out infinite; }
-    .mascot-motion[data-state="working"] .mascot-character { animation: mascot-run-route 1.35s ease-in-out infinite alternate, mascot-run-bounce .22s steps(2,end) infinite; }
-    .mascot-motion[data-state="working"] .mascot-tool { display: block; animation: hammer-swing .24s ease-in-out infinite alternate; }
-    .mascot-motion[data-state="working"] .mascot-laddoo { display: none; }
-    @keyframes mascot-idle { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-3px) rotate(2deg); } }
-    @keyframes mascot-run-route { from { left: 48px; } to { left: calc(100% - 94px); } }
-    @keyframes mascot-run-bounce { 0%,100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-5px) rotate(5deg); } }
-    @keyframes hammer-swing { from { transform: rotate(-28deg); } to { transform: rotate(30deg); } }
-    @keyframes laddoo-bite { 0%,20% { opacity: 1; transform: translate(5px,3px) scale(1); } 48% { opacity: 1; transform: translate(-7px,-9px) scale(.85); } 63% { opacity: .3; transform: translate(-6px,-7px) scale(.25); } 78%,100% { opacity: 1; transform: translate(5px,3px) scale(1); } }
-    .chat-dock .message { position: relative; z-index: 2; padding-left: 58px; }
+    .mascot-motion { position: absolute; z-index: 5; inset: 0; overflow: visible; border-radius: inherit; pointer-events: none; }
+    .mascot-character { position: absolute; left: 57px; top: -8px; width: 66px; height: 72px; }
+    .ganesha-svg { display: block; width: 66px; height: 72px; overflow: visible; filter: drop-shadow(0 2px 3px rgba(0,0,0,.46)); }
+    .runner-body { transform-origin: 40px 57px; }
+    .mascot-motion[data-state="idle"] .runner-body { animation: ganesha-idle 2.2s ease-in-out infinite; }
+    .mascot-motion[data-state="idle"] .arm-eat { transform-box: view-box; transform-origin: 52px 43px; animation: eat-arm 2.2s ease-in-out infinite; }
+    .mascot-motion[data-state="idle"] .laddu { transform-box: view-box; transform-origin: 61px 45px; animation: eat-laddu 2.2s ease-in-out infinite; }
+    .mascot-motion[data-state="working"] .mascot-character { animation: run-across .9s linear infinite alternate; }
+    .mascot-motion[data-state="working"] .runner-body { animation: running-bounce .22s steps(2,end) infinite; }
+    .mascot-motion[data-state="working"] .leg-front { transform-box: view-box; transform-origin: 44px 56px; animation: stride-front .22s ease-in-out infinite alternate; }
+    .mascot-motion[data-state="working"] .leg-back { transform-box: view-box; transform-origin: 35px 56px; animation: stride-back .22s ease-in-out infinite alternate; }
+    .mascot-motion[data-state="working"] .arm-tool { transform-box: view-box; transform-origin: 26px 43px; animation: tool-arm .22s ease-in-out infinite alternate; }
+    .mascot-motion[data-state="working"] .hammer { transform-box: view-box; transform-origin: 14px 51px; animation: hammer-swing .17s ease-in-out infinite alternate; }
+    .mascot-motion[data-state="working"] .arm-eat { transform-box: view-box; transform-origin: 51px 43px; animation: run-arm .22s ease-in-out infinite alternate; }
+    .mascot-motion[data-state="working"] .laddu { display: none; }
+    @keyframes ganesha-idle { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-3px) rotate(1deg); } }
+    @keyframes eat-arm { 0%,20%,100% { transform: rotate(0); } 45%,70% { transform: rotate(-30deg); } }
+    @keyframes eat-laddu { 0%,20%,100% { transform: translate(0,0) scale(1); opacity:1; } 45% { transform: translate(-10px,6px) scale(.85); opacity:1; } 63% { transform: translate(-10px,6px) scale(.15); opacity:.15; } 78% { transform: translate(0,0) scale(1); opacity:1; } }
+    @keyframes run-across { from { left: 57px; } to { left: calc(100% - 122px); } }
+    @keyframes running-bounce { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
+    @keyframes stride-front { from { transform: rotate(-34deg); } to { transform: rotate(34deg); } }
+    @keyframes stride-back { from { transform: rotate(32deg); } to { transform: rotate(-32deg); } }
+    @keyframes tool-arm { from { transform: rotate(-14deg); } to { transform: rotate(20deg); } }
+    @keyframes run-arm { from { transform: rotate(16deg); } to { transform: rotate(-14deg); } }
+    @keyframes hammer-swing { from { transform: rotate(-32deg); } to { transform: rotate(34deg); } }
+    .chat-dock .message { position: relative; z-index: 2; padding-left: 72px; }
     .chat-dock .attach, .chat-dock .send { position: relative; z-index: 6; }
-    @media (prefers-reduced-motion: reduce) { .mascot-character, .mascot-laddoo, .mascot-tool { animation-duration: 2.4s !important; animation-iteration-count: 1 !important; } }
+    @media (max-width: 560px) { .mascot-character { left: 50px; width: 58px; height: 66px; } .ganesha-svg { width:58px; height:66px; } .chat-dock .message { padding-left: 64px; } @keyframes run-across { from { left: 50px; } to { left: calc(100% - 112px); } } }
+    @media (prefers-reduced-motion: reduce) { .runner-body, .mascot-character, .leg-front, .leg-back, .arm-tool, .arm-eat, .hammer, .laddu { animation-duration: 1.2s !important; animation-iteration-count: 1 !important; } }
   </style>
 </head>
 <body style="background:#000;color:#fff">
@@ -164,9 +175,48 @@
   <form class="chat-dock" aria-label="Send a message" autocomplete="off">
     <div class="mascot-motion" id="mascot-motion" data-state="idle" aria-hidden="true">
       <div class="mascot-character">
-        <img class="mascot-image" src="./assets/ganesha-mascot.png" alt="">
-        <svg class="mascot-tool" viewBox="0 0 24 32" aria-hidden="true"><path d="M12 11 6 29" stroke="#7a3b23" stroke-width="3.2" stroke-linecap="round"/><path d="M4 4h15l2 4-4 4H5L2 8z" fill="#d98a51" stroke="#71351f" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        <span class="mascot-laddoo"></span>
+        <svg class="ganesha-svg" viewBox="0 0 80 80" role="presentation">
+          <g class="runner-body">
+            <g class="legs">
+              <path class="leg leg-back" d="M34 55 29 64 22 69q-3 3 1 5h14l7-13" fill="#c96c40" stroke="#63301f" stroke-width="2.5" stroke-linejoin="round"/>
+              <path class="leg leg-front" d="M46 55 51 64 59 68q4 3 0 6H45l-8-12" fill="#e98752" stroke="#63301f" stroke-width="2.5" stroke-linejoin="round"/>
+            </g>
+            <path class="torso" d="M27 40q13-8 26 0l5 17q-18 8-36 0z" fill="#df7c49" stroke="#63301f" stroke-width="2.7" stroke-linejoin="round"/>
+            <path d="M31 46q9 5 18 0M33 50q7 4 14 0" fill="none" stroke="#f5b276" stroke-width="1.5" stroke-linecap="round"/>
+            <g class="arm-tool">
+              <path d="M29 43q-8-3-11 4l-4 6" fill="none" stroke="#63301f" stroke-width="7" stroke-linecap="round"/>
+              <path d="M29 43q-8-3-11 4l-4 6" fill="none" stroke="#e98752" stroke-width="4.5" stroke-linecap="round"/>
+              <circle cx="14" cy="53" r="3.6" fill="#f0a268" stroke="#63301f" stroke-width="1.6"/>
+              <g class="hammer">
+                <path d="M14 51 9 30" stroke="#63301f" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M9 33 4 29l2-5 5 2 2-4 5 2-2 6-4 3z" fill="#d88b55" stroke="#63301f" stroke-width="2" stroke-linejoin="round"/>
+              </g>
+            </g>
+            <g class="arm-eat">
+              <path d="M51 43q9-2 12 5l-5 4" fill="none" stroke="#63301f" stroke-width="7" stroke-linecap="round"/>
+              <path d="M51 43q9-2 12 5l-5 4" fill="none" stroke="#ee9a5e" stroke-width="4.5" stroke-linecap="round"/>
+              <circle cx="58" cy="48" r="3.5" fill="#f0a268" stroke="#63301f" stroke-width="1.5"/>
+              <g class="laddu">
+                <circle cx="61" cy="45" r="3.8" fill="#e8a344" stroke="#71351f" stroke-width="1.3"/>
+                <circle cx="60" cy="44" r=".7" fill="#fff0bd"/><circle cx="63" cy="46" r=".6" fill="#fff0bd"/>
+              </g>
+            </g>
+            <g class="head">
+              <path d="M27 23Q14 18 15 32q1 9 12 12l5-9z" fill="#e99058" stroke="#63301f" stroke-width="2.5"/>
+              <path d="M53 23q13-5 12 9-1 9-12 12l-5-9z" fill="#e99058" stroke="#63301f" stroke-width="2.5"/>
+              <path d="M29 24q0-9 11-10 11 1 11 10v13q-1 9-11 10-10-1-11-10z" fill="#ef9a5e" stroke="#63301f" stroke-width="2.5"/>
+              <g class="crown">
+                <path d="M30 23 32 16l5 2 3-10 4 10 5-2 2 7z" fill="#d99050" stroke="#63301f" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M33 19h14M31 23h18" stroke="#6a3422" stroke-width="1.4"/>
+                <circle cx="40" cy="15" r="2" fill="#f6bf70" stroke="#63301f" stroke-width="1.2"/>
+              </g>
+              <rect x="33" y="29" width="4" height="3" rx=".7" fill="#381b17"/><rect x="43" y="29" width="4" height="3" rx=".7" fill="#381b17"/>
+              <path d="M38 31q-1 8 1 13v5q0 4 4 3 4-2 1-5" fill="none" stroke="#63301f" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M38 31q-1 8 1 13v5q0 4 4 3 4-2 1-5" fill="none" stroke="#e98551" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M32 36l3 1M48 36l-3 1" stroke="#fff0d1" stroke-width="1.5" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
       </div>
     </div>
     <button class="attach" id="attach-trigger" type="button" aria-label="Attach files" title="Attach files">

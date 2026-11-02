@@ -286,7 +286,7 @@
             pendingReplies = Math.max(0, pendingReplies - 1);
             if (pendingReplies === 0)
                 mascotMotion.dataset.state = 'idle';
-        }, 1600);
+        }, 2300);
     });
     attachButton.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', () => {
