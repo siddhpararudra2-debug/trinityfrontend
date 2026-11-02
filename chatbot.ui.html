@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#000000">
-  <title>Vesper.ai</title>
+  <title>trinity.ai</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cg transform='rotate(-30 12 12)'%3E%3Ccircle cx='7.3' cy='3.2' r='1.45'/%3E%3Crect x='5.5' y='4.7' width='3.6' height='14.6' rx='1.8'/%3E%3Crect x='14.9' y='4.7' width='3.6' height='14.6' rx='1.8'/%3E%3Ccircle cx='16.7' cy='20.8' r='1.45'/%3E%3C/g%3E%3C/svg%3E">
   <style>
     html, body { background: #000000 !important; color: #ffffff; }
@@ -42,6 +42,22 @@
     .send svg { width: 19px; height: 19px; }
     @media (max-width: 560px) { .wordmark { top: max(22px, env(safe-area-inset-top)); left: max(20px, env(safe-area-inset-left)); } .quote-line { top: 42%; width: calc(100vw - 40px); font-size: 18px; } body.chat-active .quote-line { top: max(24px, env(safe-area-inset-top)); left: auto; right: 20px; transform: none; width: calc(100vw - 150px); font-size: 11px; } .conversation { top: 72px; bottom: 94px; width: calc(100vw - 20px); padding: 18px 13px; border-radius: 18px; } .bubble { max-width: 90%; padding: 11px 13px; font-size: 14px; } .chat-dock { width: calc(100vw - 32px); bottom: max(20px, env(safe-area-inset-bottom)); height: 60px; border-radius: 16px; padding-left: 17px; } .send { width: 42px; height: 42px; flex-basis: 42px; border-radius: 12px; } }
     @media (prefers-reduced-motion: reduce) { .chat-dock, .send { transition: none !important; } }
+    .attach { width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.18); border-radius: 13px; background: rgba(255,255,255,.07); color: rgba(255,255,255,.9); cursor: pointer; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+    .attach:hover { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.38); }
+    .attach:active { transform: scale(.96); }
+    .attach:focus-visible { outline: 2px solid white; outline-offset: 3px; }
+    .attach svg { width: 19px; height: 19px; }
+    .chat-dock { padding-left: 11px; }
+    .attachment-list { position: fixed; z-index: 3; left: 50%; bottom: max(118px, calc(env(safe-area-inset-bottom) + 106px)); transform: translateX(-50%); width: min(680px, calc(100vw - 48px)); display: flex; flex-wrap: wrap; gap: 7px; }
+    .attachment-list:empty { display: none; }
+    .attachment-chip, .message-attachment { display: flex; align-items: center; gap: 7px; max-width: 100%; padding: 7px 9px; border: 1px solid rgba(255,255,255,.18); border-radius: 11px; background: rgba(5,5,7,.58); color: rgba(255,255,255,.87); font: 400 11px/1.2 Inter, system-ui, sans-serif; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .attachment-name { overflow: hidden; max-width: min(260px, 55vw); text-overflow: ellipsis; white-space: nowrap; }
+    .attachment-remove { width: 20px; height: 20px; flex: 0 0 20px; border: 0; border-radius: 50%; background: rgba(255,255,255,.12); color: #fff; font: 400 15px/1 Inter, system-ui, sans-serif; cursor: pointer; }
+    .attachment-remove:hover { background: rgba(255,255,255,.23); }
+    .message-attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+    .message-attachment { padding: 6px 8px; background: rgba(255,255,255,.09); font-size: 10px; }
+    .assistant .message-attachment { background: rgba(7,8,10,.4); }
+    @media (max-width: 560px) { .attach { width: 38px; height: 38px; flex-basis: 38px; border-radius: 12px; } .chat-dock { padding-left: 8px; gap: 8px; } .attachment-list { bottom: max(90px, calc(env(safe-area-inset-bottom) + 82px)); width: calc(100vw - 32px); } }
     .header-actions { position: fixed; z-index: 4; top: max(20px, env(safe-area-inset-top)); right: max(28px, env(safe-area-inset-right)); display: flex; align-items: center; gap: 8px; }
     .header-button, .panel-close { min-height: 38px; padding: 0 14px; border: 1px solid rgba(255,255,255,.19); border-radius: 12px; background: rgba(5,5,7,.20); color: rgba(255,255,255,.88); font: 500 12px/1 Inter, system-ui, sans-serif; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background .2s ease, border-color .2s ease, transform .2s ease; }
     .header-button:hover, .panel-close:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.38); }
@@ -92,7 +108,7 @@
       <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260818_072341_50851634-bbc3-4c33-9acc-7647d4db44aa.mp4" type="video/mp4">
     </video>
   </div>
-  <div class="wordmark" aria-label="trinty">trinty</div>
+  <div class="wordmark" aria-label="trinity.ai">trinity.ai</div>
   <nav class="header-actions" aria-label="Chat controls">
     <button class="header-button" id="history-open" type="button" aria-label="Open chat history">History</button>
     <button class="header-button" id="settings-open" type="button" aria-label="Open settings">Settings</button>
@@ -117,16 +133,21 @@
   </aside>
   <aside class="side-panel settings-panel" id="settings-panel" aria-label="Settings" aria-hidden="true">
     <div class="panel-heading"><div><span class="panel-kicker">PREFERENCES</span><h2>Settings</h2></div><button class="panel-close" data-close-panel type="button" aria-label="Close settings">×</button></div>
-    <label class="setting-label" for="name-setting">What should Trinty call you?</label>
+    <label class="setting-label" for="name-setting">What should Trinity call you?</label>
     <input class="setting-input" id="name-setting" type="text" maxlength="32" placeholder="Your name">
     <button class="panel-new-chat save-name" id="save-name" type="button">Save name</button>
     <div class="settings-divider"></div>
     <div class="setting-copy"><strong>Chat history</strong><span>Remove saved conversations from this device.</span></div>
     <button class="clear-history" id="clear-history" type="button">Clear all chats</button>
-    <p class="panel-footnote">Vesper.ai · Trinty</p>
+    <p class="panel-footnote">trinity.ai</p>
   </aside>
+  <div class="attachment-list" id="attachment-list" aria-live="polite"></div>
   <form class="chat-dock" aria-label="Send a message" autocomplete="off">
-    <input class="message" type="text" aria-label="Message" placeholder="Message Trinty..." autocomplete="off" spellcheck="true" maxlength="2000">
+    <button class="attach" id="attach-trigger" type="button" aria-label="Attach files" title="Attach files">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+    <input id="file-input" type="file" hidden multiple accept=".docx,.pptx,.md,.markdown,.step,.stp,.iges,.igs,.stl,.dwg,.dxf,.3mf,.obj,.f3d,.scad,.3dm,.3ds,.sldprt,.sldasm,.kicad_pcb,.kicad_sch,.kicad_mod,.brd,.sch,.pcb,.pcbdoc,.schdoc,.gbr,.ger,.drl,.ipc2581">
+    <input class="message" type="text" aria-label="Message" placeholder="Message Trinity..." autocomplete="off" spellcheck="true" maxlength="2000">
     <button class="send" type="submit" aria-label="Send message">
       <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 10h13M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>

@@ -1,6 +1,6 @@
 ((): void => {
   type Role = 'user' | 'assistant';
-  type Message = { role: Role; content: string };
+  type Message = { role: Role; content: string; attachments?: string[] };
   type ChatSession = { id: string; title: string; updatedAt: number; messages: Message[] };
 
   const getElement = <T extends Element>(selector: string): T => {
@@ -26,6 +26,9 @@
   const historyList = getById<HTMLDivElement>('history-list');
   const historySearch = getById<HTMLInputElement>('history-search');
   const nameSetting = getById<HTMLInputElement>('name-setting');
+  const fileInput = getById<HTMLInputElement>('file-input');
+  const attachmentList = getById<HTMLDivElement>('attachment-list');
+  const attachButton = getById<HTMLButtonElement>('attach-trigger');
 
   const quotes: string[] = [
     'Ready when you are.',
@@ -37,10 +40,10 @@
   ];
   const CHAT_STORAGE_KEY = 'trinty-chats';
   const ACTIVE_STORAGE_KEY = 'trinty-active-chat';
-
   let name = '';
   let activeChatId = '';
   let chats: ChatSession[] = [];
+  let selectedFiles: File[] = [];
   try {
     name = localStorage.getItem('trinty-name') || '';
     chats = JSON.parse(localStorage.getItem(CHAT_STORAGE_KEY) || '[]') as ChatSession[];
@@ -64,21 +67,50 @@
   const scrollToLatest = (): void => {
     conversation.scrollTop = conversation.scrollHeight;
   };
-  const appendMessage = (role: Role, text: string, typing = false): HTMLDivElement => {
+  const appendMessage = (role: Role, text: string, attachedFiles: string[] = [], typing = false): HTMLDivElement => {
     const row = document.createElement('div');
     row.className = `message-row ${role}${typing ? ' typing' : ''}`;
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.textContent = text;
+    if (attachedFiles.length) {
+      const attachmentGroup = document.createElement('div');
+      attachmentGroup.className = 'message-attachments';
+      attachedFiles.forEach((fileName) => {
+        const item = document.createElement('span');
+        item.className = 'message-attachment';
+        item.textContent = fileName;
+        attachmentGroup.appendChild(item);
+      });
+      bubble.appendChild(attachmentGroup);
+    }
     row.appendChild(bubble);
     messagesNode.appendChild(row);
     return row;
   };
   const renderMessages = (items: Message[], typing = false): void => {
     messagesNode.replaceChildren();
-    items.forEach((message) => appendMessage(message.role, message.content));
-    if (typing) appendMessage('assistant', 'Thinking…', true);
+    items.forEach((message) => appendMessage(message.role, message.content, message.attachments || []));
+    if (typing) appendMessage('assistant', 'Thinking…', [], true);
     requestAnimationFrame(scrollToLatest);
+  };
+  const renderAttachmentQueue = (): void => {
+    attachmentList.replaceChildren();
+    selectedFiles.forEach((file, index) => {
+      const chip = document.createElement('div');
+      chip.className = 'attachment-chip';
+      const fileName = document.createElement('span');
+      fileName.className = 'attachment-name';
+      fileName.textContent = file.name;
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'attachment-remove';
+      remove.dataset.removeAttachment = String(index);
+      remove.setAttribute('aria-label', `Remove ${file.name}`);
+      remove.textContent = '×';
+      chip.append(fileName, remove);
+      attachmentList.appendChild(chip);
+    });
   };
   const homeGreeting = (): string => name ? `Good morning, ${name}.` : 'Ready when you are.';
   const renderHome = (): void => {
@@ -88,6 +120,9 @@
     messagesNode.replaceChildren();
     quote.textContent = homeGreeting();
     input.value = '';
+    selectedFiles = [];
+    fileInput.value = '';
+    renderAttachmentQueue();
     renderHistory();
   };
 
@@ -202,31 +237,61 @@
   form.addEventListener('submit', (event: SubmitEvent) => {
     event.preventDefault();
     const entered = input.value.trim();
-    if (!entered) return;
+    const attachedFiles = [...selectedFiles];
+    if (!entered && !attachedFiles.length) return;
+    const messageText = entered || 'Please take a look at these files.';
+    const attachmentNames = attachedFiles.map((file) => file.name);
     let chat = activeChat();
     if (!chat) {
-      chat = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, title: entered.slice(0, 48), updatedAt: Date.now(), messages: [] };
+      chat = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, title: (entered || attachmentNames[0] || 'New chat').slice(0, 48), updatedAt: Date.now(), messages: [] };
       chats.push(chat);
       activeChatId = chat.id;
     }
     document.body.classList.add('chat-active');
-    chat.messages.push({ role: 'user', content: entered });
+    chat.messages.push({ role: 'user', content: messageText, ...(attachmentNames.length ? { attachments: attachmentNames } : {}) });
     chat.updatedAt = Date.now();
     safeSave();
     renderMessages(chat.messages, true);
     renderHistory();
     const responseChatId = chat.id;
+    selectedFiles = [];
+    fileInput.value = '';
+    renderAttachmentQueue();
     input.value = '';
     input.focus();
     window.setTimeout(() => {
       const current = chats.find((item) => item.id === responseChatId);
       if (!current) return;
-      current.messages.push({ role: 'assistant', content: makeReply(entered) });
+      const reply = attachmentNames.length
+        ? `I can see ${attachmentNames.length} attached file name${attachmentNames.length === 1 ? '' : 's'}. File contents are not analyzed by this frontend yet.` + (entered ? ` ${makeReply(entered)}` : ' What would you like to do with them?')
+        : makeReply(entered);
+      current.messages.push({ role: 'assistant', content: reply });
       current.updatedAt = Date.now();
       safeSave();
-      renderMessages(current.messages);
+      if (activeChatId === responseChatId) renderMessages(current.messages);
       renderHistory();
     }, 620);
+  });
+
+  attachButton.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => {
+    const incomingFiles = Array.from(fileInput.files || []);
+    incomingFiles.forEach((file) => {
+      const alreadySelected = selectedFiles.some((existing) => existing.name === file.name && existing.size === file.size && existing.lastModified === file.lastModified);
+      if (!alreadySelected) selectedFiles.push(file);
+    });
+    fileInput.value = '';
+    renderAttachmentQueue();
+    if (selectedFiles.length) input.focus();
+  });
+  attachmentList.addEventListener('click', (event: MouseEvent) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const removeButton = target.closest<HTMLButtonElement>('[data-remove-attachment]');
+    if (!removeButton) return;
+    const index = Number(removeButton.dataset.removeAttachment);
+    if (Number.isInteger(index)) selectedFiles.splice(index, 1);
+    renderAttachmentQueue();
   });
 
   getById<HTMLButtonElement>('history-open').addEventListener('click', () => openPanel(historyPanel));
@@ -294,4 +359,5 @@
   }
   nameSetting.value = name;
   renderHistory();
+  renderAttachmentQueue();
 })();

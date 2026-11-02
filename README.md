@@ -1,6 +1,6 @@
-# Vesper.ai TypeScript frontend
+# trinity.ai TypeScript frontend
 
-A responsive, browser-only chatbot frontend based on the supplied Trinty template. It keeps the original black-and-white palette, video backdrop, and quote and input animations.
+A responsive, browser-only chatbot frontend based on the supplied template. It keeps the original black-and-white palette, video backdrop, and quote and input animations.
 
 ## Features
 
@@ -8,7 +8,8 @@ A responsive, browser-only chatbot frontend based on the supplied Trinty templat
 - Suggested prompts and a new-chat action
 - Local chat history with search, open, and delete controls
 - Settings for the saved display name and clearing chat history
-- Conversations stored in the browser on this device
+- Multiple local file selections for DOCX, PPTX, Markdown, common CAD formats, and PCB design/export formats
+- File names shown in chat; file contents are not uploaded or analyzed until a backend is connected
 
 ## Run locally
 
