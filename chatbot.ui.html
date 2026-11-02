@@ -42,6 +42,48 @@
     .send svg { width: 19px; height: 19px; }
     @media (max-width: 560px) { .wordmark { top: max(22px, env(safe-area-inset-top)); left: max(20px, env(safe-area-inset-left)); } .quote-line { top: 42%; width: calc(100vw - 40px); font-size: 18px; } body.chat-active .quote-line { top: max(24px, env(safe-area-inset-top)); left: auto; right: 20px; transform: none; width: calc(100vw - 150px); font-size: 11px; } .conversation { top: 72px; bottom: 94px; width: calc(100vw - 20px); padding: 18px 13px; border-radius: 18px; } .bubble { max-width: 90%; padding: 11px 13px; font-size: 14px; } .chat-dock { width: calc(100vw - 32px); bottom: max(20px, env(safe-area-inset-bottom)); height: 60px; border-radius: 16px; padding-left: 17px; } .send { width: 42px; height: 42px; flex-basis: 42px; border-radius: 12px; } }
     @media (prefers-reduced-motion: reduce) { .chat-dock, .send { transition: none !important; } }
+    .header-actions { position: fixed; z-index: 4; top: max(20px, env(safe-area-inset-top)); right: max(28px, env(safe-area-inset-right)); display: flex; align-items: center; gap: 8px; }
+    .header-button, .panel-close { min-height: 38px; padding: 0 14px; border: 1px solid rgba(255,255,255,.19); border-radius: 12px; background: rgba(5,5,7,.20); color: rgba(255,255,255,.88); font: 500 12px/1 Inter, system-ui, sans-serif; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+    .header-button:hover, .panel-close:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.38); }
+    .header-button:active, .panel-close:active { transform: scale(.97); }
+    .new-chat-button, .panel-new-chat { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.27); }
+    .quick-start { position: fixed; z-index: 2; top: 54%; left: 50%; width: min(760px, calc(100vw - 48px)); transform: translateX(-50%); display: flex; justify-content: center; flex-wrap: wrap; gap: 9px; transition: opacity .25s ease, transform .25s ease; }
+    body.chat-active .quick-start { opacity: 0; pointer-events: none; transform: translate(-50%, 8px); }
+    .prompt-chip { padding: 10px 14px; border: 1px solid rgba(255,255,255,.17); border-radius: 999px; color: rgba(255,255,255,.82); background: rgba(5,5,7,.18); font: 400 12px/1.2 Inter, system-ui, sans-serif; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+    .prompt-chip:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.34); transform: translateY(-2px); }
+    .panel-scrim { position: fixed; z-index: 5; inset: 0; background: rgba(0,0,0,.48); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); opacity: 0; transition: opacity .24s ease; }
+    .panel-scrim:not([hidden]) { display: block; opacity: 1; }
+    .side-panel { position: fixed; z-index: 6; top: 0; bottom: 0; width: min(370px, calc(100vw - 34px)); display: flex; flex-direction: column; padding: max(25px, env(safe-area-inset-top)) 22px max(20px, env(safe-area-inset-bottom)); border: 1px solid rgba(255,255,255,.14); background: rgba(4,5,7,.86); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); box-shadow: 0 0 80px rgba(0,0,0,.4); transition: transform .28s cubic-bezier(.2,.8,.2,1); }
+    .history-panel { left: 0; border-radius: 0 22px 22px 0; transform: translateX(-102%); }
+    .settings-panel { right: 0; border-radius: 22px 0 0 22px; transform: translateX(102%); }
+    .side-panel.is-open { transform: translateX(0); }
+    .panel-heading { display: flex; justify-content: space-between; align-items: center; margin: 5px 0 25px; }
+    .panel-kicker { color: rgba(255,255,255,.48); font: 600 9px/1 Inter, system-ui, sans-serif; letter-spacing: .16em; }
+    .panel-heading h2 { margin-top: 7px; color: rgba(255,255,255,.94); font: 500 22px/1.1 Inter, system-ui, sans-serif; letter-spacing: -.04em; }
+    .panel-close { min-width: 38px; padding: 0; font: 300 25px/1 Inter, system-ui, sans-serif; }
+    .history-search-wrap { display: block; margin-bottom: 11px; }
+    .history-search-wrap input, .setting-input { width: 100%; height: 43px; padding: 0 13px; border: 1px solid rgba(255,255,255,.15); border-radius: 12px; outline: 0; background: rgba(255,255,255,.055); color: #fff; font: 400 13px/1 Inter, system-ui, sans-serif; }
+    .history-search-wrap input::placeholder, .setting-input::placeholder { color: rgba(255,255,255,.43); }
+    .history-search-wrap input:focus, .setting-input:focus { border-color: rgba(255,255,255,.42); }
+    .panel-new-chat { width: 100%; min-height: 43px; border: 1px solid rgba(255,255,255,.23); border-radius: 12px; color: #fff; font: 500 13px/1 Inter, system-ui, sans-serif; cursor: pointer; transition: background .2s ease, border-color .2s ease; }
+    .panel-new-chat:hover { background: rgba(255,255,255,.19); border-color: rgba(255,255,255,.4); }
+    .history-list { display: flex; flex-direction: column; gap: 6px; margin-top: 20px; overflow: auto; }
+    .history-item { display: flex; align-items: center; gap: 8px; min-height: 45px; padding: 4px 6px 4px 12px; border: 1px solid transparent; border-radius: 11px; color: rgba(255,255,255,.8); background: transparent; transition: background .2s ease, border-color .2s ease; }
+    .history-item.is-current, .history-item:hover { border-color: rgba(255,255,255,.13); background: rgba(255,255,255,.075); }
+    .history-open-item { flex: 1; min-width: 0; overflow: hidden; border: 0; background: none; color: inherit; text-align: left; font: 400 12px/1.4 Inter, system-ui, sans-serif; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+    .history-delete { width: 28px; height: 28px; flex: 0 0 28px; border: 0; border-radius: 8px; background: transparent; color: rgba(255,255,255,.48); font: 400 17px/1 Inter, system-ui, sans-serif; cursor: pointer; }
+    .history-delete:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .history-empty { padding: 18px 6px; color: rgba(255,255,255,.48); font: 400 12px/1.55 Inter, system-ui, sans-serif; }
+    .panel-footnote { margin-top: auto; padding-top: 18px; color: rgba(255,255,255,.38); font: 400 10px/1.4 Inter, system-ui, sans-serif; }
+    .setting-label { margin-bottom: 9px; color: rgba(255,255,255,.75); font: 400 12px/1.4 Inter, system-ui, sans-serif; }
+    .save-name { margin-top: 10px; }
+    .settings-divider { height: 1px; margin: 28px 0 20px; background: rgba(255,255,255,.13); }
+    .setting-copy { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; color: rgba(255,255,255,.86); font: 500 12px/1.4 Inter, system-ui, sans-serif; }
+    .setting-copy span { color: rgba(255,255,255,.48); font-weight: 400; }
+    .clear-history { align-self: flex-start; padding: 9px 12px; border: 1px solid rgba(255,255,255,.18); border-radius: 10px; background: rgba(255,255,255,.06); color: rgba(255,255,255,.8); font: 400 11px/1 Inter, system-ui, sans-serif; cursor: pointer; transition: background .2s ease; }
+    .clear-history:hover { background: rgba(255,255,255,.14); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 560px) { .header-actions { top: max(15px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); gap: 5px; } .header-button { min-height: 34px; padding: 0 9px; font-size: 10px; } .quick-start { top: 53%; width: calc(100vw - 30px); gap: 7px; } .prompt-chip { padding: 9px 11px; font-size: 10px; } .side-panel { padding-left: 17px; padding-right: 17px; } }
   </style>
 </head>
 <body style="background:#000;color:#fff">
@@ -51,10 +93,38 @@
     </video>
   </div>
   <div class="wordmark" aria-label="trinty">trinty</div>
+  <nav class="header-actions" aria-label="Chat controls">
+    <button class="header-button" id="history-open" type="button" aria-label="Open chat history">History</button>
+    <button class="header-button" id="settings-open" type="button" aria-label="Open settings">Settings</button>
+    <button class="header-button new-chat-button" id="new-chat" type="button">+ New chat</button>
+  </nav>
   <div class="quote-line" aria-live="polite">Ready when you are.</div>
+  <div class="quick-start" aria-label="Suggested prompts">
+    <button type="button" class="prompt-chip" data-prompt="Help me brainstorm a project idea">Brainstorm an idea</button>
+    <button type="button" class="prompt-chip" data-prompt="Help me make a plan for this week">Make a plan</button>
+    <button type="button" class="prompt-chip" data-prompt="I want to learn something new. Where should I start?">Learn something new</button>
+  </div>
   <section class="conversation" aria-label="Conversation" aria-live="polite">
     <div class="messages" id="messages"></div>
   </section>
+  <div class="panel-scrim" id="panel-scrim" hidden></div>
+  <aside class="side-panel history-panel" id="history-panel" aria-label="Chat history" aria-hidden="true">
+    <div class="panel-heading"><div><span class="panel-kicker">YOUR SPACE</span><h2>History</h2></div><button class="panel-close" data-close-panel type="button" aria-label="Close history">×</button></div>
+    <label class="history-search-wrap"><span class="sr-only">Search chats</span><input id="history-search" type="search" placeholder="Search chats..."></label>
+    <button class="panel-new-chat" id="panel-new-chat" type="button">+ Start a new chat</button>
+    <div class="history-list" id="history-list"></div>
+    <p class="panel-footnote">Your chats are saved on this device.</p>
+  </aside>
+  <aside class="side-panel settings-panel" id="settings-panel" aria-label="Settings" aria-hidden="true">
+    <div class="panel-heading"><div><span class="panel-kicker">PREFERENCES</span><h2>Settings</h2></div><button class="panel-close" data-close-panel type="button" aria-label="Close settings">×</button></div>
+    <label class="setting-label" for="name-setting">What should Trinty call you?</label>
+    <input class="setting-input" id="name-setting" type="text" maxlength="32" placeholder="Your name">
+    <button class="panel-new-chat save-name" id="save-name" type="button">Save name</button>
+    <div class="settings-divider"></div>
+    <div class="setting-copy"><strong>Chat history</strong><span>Remove saved conversations from this device.</span></div>
+    <button class="clear-history" id="clear-history" type="button">Clear all chats</button>
+    <p class="panel-footnote">Vesper.ai · Trinty</p>
+  </aside>
   <form class="chat-dock" aria-label="Send a message" autocomplete="off">
     <input class="message" type="text" aria-label="Message" placeholder="Message Trinty..." autocomplete="off" spellcheck="true" maxlength="2000">
     <button class="send" type="submit" aria-label="Send message">
@@ -64,4 +134,3 @@
   <script type="module" src="./chatbot.ui.js"></script>
 </body>
 </html>
-

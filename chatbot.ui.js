@@ -15,9 +15,15 @@
     const video = getById('hero-motion');
     const quote = getElement('.quote-line');
     const input = getElement('.message');
-    const messages = getById('messages');
+    const messagesNode = getById('messages');
     const conversation = getElement('.conversation');
     const form = getElement('.chat-dock');
+    const historyPanel = getById('history-panel');
+    const settingsPanel = getById('settings-panel');
+    const scrim = getById('panel-scrim');
+    const historyList = getById('history-list');
+    const historySearch = getById('history-search');
+    const nameSetting = getById('name-setting');
     const quotes = [
         'Ready when you are.',
         'The world needs your inputs to function. You can’t quit now.',
@@ -26,36 +32,130 @@
         'Take a breath. Then make something brilliant.',
         'You’ve got this. The future is rooting for you.'
     ];
+    const CHAT_STORAGE_KEY = 'trinty-chats';
+    const ACTIVE_STORAGE_KEY = 'trinty-active-chat';
     let name = '';
+    let activeChatId = '';
+    let chats = [];
     try {
         name = localStorage.getItem('trinty-name') || '';
+        chats = JSON.parse(localStorage.getItem(CHAT_STORAGE_KEY) || '[]');
+        activeChatId = localStorage.getItem(ACTIVE_STORAGE_KEY) || '';
+        if (!Array.isArray(chats))
+            chats = [];
     }
     catch {
-        // Storage may be unavailable; the page continues without saving a name.
+        chats = [];
+        activeChatId = '';
     }
+    const activeChat = () => chats.find((chat) => chat.id === activeChatId);
+    const safeSave = () => {
+        try {
+            localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chats));
+            if (activeChatId)
+                localStorage.setItem(ACTIVE_STORAGE_KEY, activeChatId);
+            else
+                localStorage.removeItem(ACTIVE_STORAGE_KEY);
+        }
+        catch {
+            // The interface remains usable when storage is unavailable or full.
+        }
+    };
     const scrollToLatest = () => {
         conversation.scrollTop = conversation.scrollHeight;
     };
-    const addMessage = (role, text) => {
+    const appendMessage = (role, text, typing = false) => {
         const row = document.createElement('div');
-        row.className = `message-row ${role}`;
+        row.className = `message-row ${role}${typing ? ' typing' : ''}`;
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
         bubble.textContent = text;
         row.appendChild(bubble);
-        messages.appendChild(row);
-        requestAnimationFrame(scrollToLatest);
+        messagesNode.appendChild(row);
         return row;
     };
+    const renderMessages = (items, typing = false) => {
+        messagesNode.replaceChildren();
+        items.forEach((message) => appendMessage(message.role, message.content));
+        if (typing)
+            appendMessage('assistant', 'Thinking…', true);
+        requestAnimationFrame(scrollToLatest);
+    };
     const homeGreeting = () => name ? `Good morning, ${name}.` : 'Ready when you are.';
-    const resetToHome = () => {
+    const renderHome = () => {
+        activeChatId = '';
         document.body.classList.remove('chat-active');
-        messages.replaceChildren();
-        addMessage('assistant', name ? `Good morning, ${name}. What are you working on?` : 'Hey, I’m Trinty. What are you working on?');
+        safeSave();
+        messagesNode.replaceChildren();
         quote.textContent = homeGreeting();
         input.value = '';
+        renderHistory();
     };
-    resetToHome();
+    const renderHistory = () => {
+        const query = historySearch.value.trim().toLowerCase();
+        const visibleChats = [...chats]
+            .sort((a, b) => b.updatedAt - a.updatedAt)
+            .filter((chat) => !query || chat.title.toLowerCase().includes(query) || chat.messages.some((message) => message.content.toLowerCase().includes(query)));
+        historyList.replaceChildren();
+        if (!visibleChats.length) {
+            const empty = document.createElement('p');
+            empty.className = 'history-empty';
+            empty.textContent = query ? 'No chats match your search.' : 'Your conversations will show up here.';
+            historyList.appendChild(empty);
+            return;
+        }
+        visibleChats.forEach((chat) => {
+            const row = document.createElement('div');
+            row.className = `history-item${chat.id === activeChatId ? ' is-current' : ''}`;
+            const openButton = document.createElement('button');
+            openButton.className = 'history-open-item';
+            openButton.type = 'button';
+            openButton.dataset.chatId = chat.id;
+            openButton.textContent = chat.title;
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'history-delete';
+            deleteButton.type = 'button';
+            deleteButton.dataset.deleteChat = chat.id;
+            deleteButton.setAttribute('aria-label', `Delete ${chat.title}`);
+            deleteButton.textContent = '×';
+            row.append(openButton, deleteButton);
+            historyList.appendChild(row);
+        });
+    };
+    const closePanels = () => {
+        historyPanel.classList.remove('is-open');
+        settingsPanel.classList.remove('is-open');
+        historyPanel.setAttribute('aria-hidden', 'true');
+        settingsPanel.setAttribute('aria-hidden', 'true');
+        scrim.hidden = true;
+    };
+    const openPanel = (panel) => {
+        closePanels();
+        panel.classList.add('is-open');
+        panel.setAttribute('aria-hidden', 'false');
+        scrim.hidden = false;
+        if (panel === settingsPanel)
+            nameSetting.value = name;
+        if (panel === historyPanel)
+            renderHistory();
+    };
+    const openChat = (chatId) => {
+        const chat = chats.find((item) => item.id === chatId);
+        if (!chat)
+            return;
+        activeChatId = chat.id;
+        safeSave();
+        document.body.classList.add('chat-active');
+        renderMessages(chat.messages);
+        renderHistory();
+        closePanels();
+        input.focus();
+    };
+    const newChat = () => {
+        closePanels();
+        renderHome();
+        input.focus();
+    };
     let quoteIndex = 0;
     const rotateQuote = () => {
         quote.classList.add('is-changing');
@@ -67,9 +167,8 @@
     };
     window.setInterval(rotateQuote, 4800);
     const keepPlaying = () => {
-        if (document.visibilityState === 'visible' && video.paused) {
+        if (document.visibilityState === 'visible' && video.paused)
             void video.play().catch(() => undefined);
-        }
     };
     video.addEventListener('canplay', keepPlaying);
     video.addEventListener('ended', () => {
@@ -82,11 +181,6 @@
             keepPlaying();
     }, 2500);
     void video.play().catch(() => undefined);
-    window.addEventListener('pagehide', resetToHome);
-    window.addEventListener('pageshow', (event) => {
-        if (event.persisted)
-            resetToHome();
-    });
     const makeReply = (text) => {
         const lower = text.toLowerCase();
         const nameMatch = text.match(/(?:my name is|i am|i'm|call me)\s+([a-z][a-z' -]{0,30})/i);
@@ -95,9 +189,7 @@
             try {
                 localStorage.setItem('trinty-name', name);
             }
-            catch {
-                // Keep the name for this page session when storage is unavailable.
-            }
+            catch { /* Session-only name. */ }
             return `Good morning, ${name}. What would you like to work on?`;
         }
         if (/\b(drone|uav|quad(copter)?|multirotor)\b/.test(lower)) {
@@ -106,9 +198,8 @@
                 ? 'A 30 × 30 cm drone is a good starting envelope. What will it carry, how long should it fly, where will it operate, and what is your budget?'
                 : 'I can help plan the drone. What size, payload, flight time, operating environment, and budget should I design around?';
         }
-        if (/\b(good morning|hello|hi|hey)\b/.test(lower)) {
+        if (/\b(good morning|hello|hi|hey)\b/.test(lower))
             return name ? `Good morning, ${name}. What can I help you figure out today?` : 'Hey! What are you hoping to build or solve today?';
-        }
         if (/\b(thanks|thank you)\b/.test(lower))
             return 'You’re welcome. What would you like to work on next?';
         return 'Tell me what you want to make, what it needs to do, and any limits I should keep in mind.';
@@ -118,15 +209,104 @@
         const entered = input.value.trim();
         if (!entered)
             return;
+        let chat = activeChat();
+        if (!chat) {
+            chat = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, title: entered.slice(0, 48), updatedAt: Date.now(), messages: [] };
+            chats.push(chat);
+            activeChatId = chat.id;
+        }
         document.body.classList.add('chat-active');
-        addMessage('user', entered);
+        chat.messages.push({ role: 'user', content: entered });
+        chat.updatedAt = Date.now();
+        safeSave();
+        renderMessages(chat.messages, true);
+        renderHistory();
+        const responseChatId = chat.id;
         input.value = '';
         input.focus();
-        const typing = addMessage('assistant', 'Thinking…');
-        typing.classList.add('typing');
         window.setTimeout(() => {
-            typing.remove();
-            addMessage('assistant', makeReply(entered));
+            const current = chats.find((item) => item.id === responseChatId);
+            if (!current)
+                return;
+            current.messages.push({ role: 'assistant', content: makeReply(entered) });
+            current.updatedAt = Date.now();
+            safeSave();
+            renderMessages(current.messages);
+            renderHistory();
         }, 620);
     });
+    getById('history-open').addEventListener('click', () => openPanel(historyPanel));
+    getById('settings-open').addEventListener('click', () => openPanel(settingsPanel));
+    getById('new-chat').addEventListener('click', newChat);
+    getById('panel-new-chat').addEventListener('click', newChat);
+    document.querySelectorAll('[data-close-panel]').forEach((button) => button.addEventListener('click', closePanels));
+    scrim.addEventListener('click', closePanels);
+    historySearch.addEventListener('input', renderHistory);
+    historyList.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement))
+            return;
+        const deleteButton = target.closest('[data-delete-chat]');
+        if (deleteButton) {
+            const chatId = deleteButton.dataset.deleteChat || '';
+            const chat = chats.find((item) => item.id === chatId);
+            if (!chat || !window.confirm(`Delete “${chat.title}”?`))
+                return;
+            chats = chats.filter((item) => item.id !== chatId);
+            if (activeChatId === chatId)
+                renderHome();
+            safeSave();
+            renderHistory();
+            return;
+        }
+        const openButton = target.closest('[data-chat-id]');
+        if (openButton?.dataset.chatId)
+            openChat(openButton.dataset.chatId);
+    });
+    document.querySelectorAll('[data-prompt]').forEach((button) => {
+        button.addEventListener('click', () => {
+            input.value = button.dataset.prompt || '';
+            form.requestSubmit();
+        });
+    });
+    getById('save-name').addEventListener('click', () => {
+        name = nameSetting.value.trim().replace(/[<>]/g, '').slice(0, 32);
+        try {
+            if (name)
+                localStorage.setItem('trinty-name', name);
+            else
+                localStorage.removeItem('trinty-name');
+        }
+        catch { /* Keep the preference for this session. */ }
+        quote.textContent = homeGreeting();
+        closePanels();
+    });
+    getById('clear-history').addEventListener('click', () => {
+        if (!chats.length || !window.confirm('Clear all saved chats on this device?'))
+            return;
+        chats = [];
+        renderHome();
+        renderHistory();
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape')
+            closePanels();
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+            event.preventDefault();
+            openPanel(historyPanel);
+            historySearch.focus();
+        }
+    });
+    const savedChat = activeChat();
+    if (savedChat) {
+        document.body.classList.add('chat-active');
+        renderMessages(savedChat.messages);
+    }
+    else {
+        activeChatId = '';
+        messagesNode.replaceChildren();
+        quote.textContent = homeGreeting();
+    }
+    nameSetting.value = name;
+    renderHistory();
 })();
