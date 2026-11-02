@@ -57,7 +57,7 @@
     .message-attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
     .message-attachment { padding: 6px 8px; background: rgba(255,255,255,.09); font-size: 10px; }
     .assistant .message-attachment { background: rgba(7,8,10,.4); }
-    @media (max-width: 560px) { .attach { width: 38px; height: 38px; flex-basis: 38px; border-radius: 12px; } .chat-dock { padding-left: 8px; gap: 8px; } .attachment-list { bottom: max(90px, calc(env(safe-area-inset-bottom) + 82px)); width: calc(100vw - 32px); } }
+    @media (max-width: 560px) { .attach { width: 38px; height: 38px; flex-basis: 38px; border-radius: 12px; } .chat-dock { padding-left: 8px; gap: 8px; } .chat-dock .message { padding-left: 50px; } .attachment-list { bottom: max(90px, calc(env(safe-area-inset-bottom) + 82px)); width: calc(100vw - 32px); } }
     .header-actions { position: fixed; z-index: 4; top: max(20px, env(safe-area-inset-top)); right: max(28px, env(safe-area-inset-right)); display: flex; align-items: center; gap: 8px; }
     .header-button, .panel-close { min-height: 38px; padding: 0 14px; border: 1px solid rgba(255,255,255,.19); border-radius: 12px; background: rgba(5,5,7,.20); color: rgba(255,255,255,.88); font: 500 12px/1 Inter, system-ui, sans-serif; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background .2s ease, border-color .2s ease, transform .2s ease; }
     .header-button:hover, .panel-close:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.38); }
@@ -100,6 +100,25 @@
     .clear-history:hover { background: rgba(255,255,255,.14); }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     @media (max-width: 560px) { .header-actions { top: max(15px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); gap: 5px; } .header-button { min-height: 34px; padding: 0 9px; font-size: 10px; } .quick-start { top: 53%; width: calc(100vw - 30px); gap: 7px; } .prompt-chip { padding: 9px 11px; font-size: 10px; } .side-panel { padding-left: 17px; padding-right: 17px; } }
+
+    .mascot-motion { position: absolute; z-index: 5; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none; }
+    .mascot-character { position: absolute; left: 48px; top: 8px; width: 44px; height: 52px; transform-origin: 50% 82%; }
+    .mascot-image { display: block; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.36); border-radius: 50%; object-fit: cover; image-rendering: pixelated; box-shadow: 0 2px 10px rgba(0,0,0,.38); }
+    .mascot-tool { display: none; position: absolute; z-index: 1; top: -4px; right: -4px; width: 21px; height: 29px; transform-origin: 65% 80%; filter: drop-shadow(0 1px 2px rgba(0,0,0,.42)); }
+    .mascot-laddoo { position: absolute; z-index: 2; top: 33px; left: 27px; display: block; width: 9px; height: 9px; border: 1px solid rgba(107,48,16,.78); border-radius: 50%; background: radial-gradient(circle at 32% 28%, #ffe49a 0 16%, #e5a44a 34%, #c56b2f 100%); box-shadow: 0 1px 4px rgba(0,0,0,.45); animation: laddoo-bite 2.4s ease-in-out infinite; }
+    .mascot-laddoo::after { content: ""; position: absolute; top: 2px; left: 3px; width: 1px; height: 1px; border-radius: 50%; background: #fff0c6; box-shadow: 3px 2px 0 #fff0c6, 1px 4px 0 rgba(255,245,218,.9); }
+    .mascot-motion[data-state="idle"] .mascot-character { animation: mascot-idle 2.4s ease-in-out infinite; }
+    .mascot-motion[data-state="working"] .mascot-character { animation: mascot-run-route 1.35s ease-in-out infinite alternate, mascot-run-bounce .22s steps(2,end) infinite; }
+    .mascot-motion[data-state="working"] .mascot-tool { display: block; animation: hammer-swing .24s ease-in-out infinite alternate; }
+    .mascot-motion[data-state="working"] .mascot-laddoo { display: none; }
+    @keyframes mascot-idle { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-3px) rotate(2deg); } }
+    @keyframes mascot-run-route { from { left: 48px; } to { left: calc(100% - 94px); } }
+    @keyframes mascot-run-bounce { 0%,100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-5px) rotate(5deg); } }
+    @keyframes hammer-swing { from { transform: rotate(-28deg); } to { transform: rotate(30deg); } }
+    @keyframes laddoo-bite { 0%,20% { opacity: 1; transform: translate(5px,3px) scale(1); } 48% { opacity: 1; transform: translate(-7px,-9px) scale(.85); } 63% { opacity: .3; transform: translate(-6px,-7px) scale(.25); } 78%,100% { opacity: 1; transform: translate(5px,3px) scale(1); } }
+    .chat-dock .message { position: relative; z-index: 2; padding-left: 58px; }
+    .chat-dock .attach, .chat-dock .send { position: relative; z-index: 6; }
+    @media (prefers-reduced-motion: reduce) { .mascot-character, .mascot-laddoo, .mascot-tool { animation-duration: 2.4s !important; animation-iteration-count: 1 !important; } }
   </style>
 </head>
 <body style="background:#000;color:#fff">
@@ -143,6 +162,13 @@
   </aside>
   <div class="attachment-list" id="attachment-list" aria-live="polite"></div>
   <form class="chat-dock" aria-label="Send a message" autocomplete="off">
+    <div class="mascot-motion" id="mascot-motion" data-state="idle" aria-hidden="true">
+      <div class="mascot-character">
+        <img class="mascot-image" src="./assets/ganesha-mascot.png" alt="">
+        <svg class="mascot-tool" viewBox="0 0 24 32" aria-hidden="true"><path d="M12 11 6 29" stroke="#7a3b23" stroke-width="3.2" stroke-linecap="round"/><path d="M4 4h15l2 4-4 4H5L2 8z" fill="#d98a51" stroke="#71351f" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span class="mascot-laddoo"></span>
+      </div>
+    </div>
     <button class="attach" id="attach-trigger" type="button" aria-label="Attach files" title="Attach files">
       <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
     </button>

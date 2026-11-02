@@ -29,6 +29,8 @@
   const fileInput = getById<HTMLInputElement>('file-input');
   const attachmentList = getById<HTMLDivElement>('attachment-list');
   const attachButton = getById<HTMLButtonElement>('attach-trigger');
+  const mascotMotion = getById<HTMLDivElement>('mascot-motion');
+  let pendingReplies = 0;
 
   const quotes: string[] = [
     'Ready when you are.',
@@ -248,6 +250,8 @@
       activeChatId = chat.id;
     }
     document.body.classList.add('chat-active');
+    pendingReplies += 1;
+    mascotMotion.dataset.state = 'working';
     chat.messages.push({ role: 'user', content: messageText, ...(attachmentNames.length ? { attachments: attachmentNames } : {}) });
     chat.updatedAt = Date.now();
     safeSave();
@@ -261,16 +265,19 @@
     input.focus();
     window.setTimeout(() => {
       const current = chats.find((item) => item.id === responseChatId);
-      if (!current) return;
-      const reply = attachmentNames.length
-        ? `I can see ${attachmentNames.length} attached file name${attachmentNames.length === 1 ? '' : 's'}. File contents are not analyzed by this frontend yet.` + (entered ? ` ${makeReply(entered)}` : ' What would you like to do with them?')
-        : makeReply(entered);
-      current.messages.push({ role: 'assistant', content: reply });
-      current.updatedAt = Date.now();
-      safeSave();
-      if (activeChatId === responseChatId) renderMessages(current.messages);
-      renderHistory();
-    }, 620);
+      if (current) {
+        const reply = attachmentNames.length
+          ? `I can see ${attachmentNames.length} attached file name${attachmentNames.length === 1 ? '' : 's'}. File contents are not analyzed by this frontend yet.` + (entered ? ` ${makeReply(entered)}` : ' What would you like to do with them?')
+          : makeReply(entered);
+        current.messages.push({ role: 'assistant', content: reply });
+        current.updatedAt = Date.now();
+        safeSave();
+        if (activeChatId === responseChatId) renderMessages(current.messages);
+        renderHistory();
+      }
+      pendingReplies = Math.max(0, pendingReplies - 1);
+      if (pendingReplies === 0) mascotMotion.dataset.state = 'idle';
+    }, 1600);
   });
 
   attachButton.addEventListener('click', () => fileInput.click());

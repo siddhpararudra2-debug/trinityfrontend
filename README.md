@@ -1,6 +1,6 @@
 # trinity.ai TypeScript frontend
 
-A responsive, browser-only chatbot frontend based on the supplied template. It keeps the original black-and-white palette, video backdrop, and quote and input animations.
+A responsive, browser-only chatbot frontend based on the supplied template. It keeps the original black-and-white palette, video backdrop, and quote and input animations. The uploaded Ganesha artwork is cropped into a small mascot asset for the chat bar.
 
 ## Features
 
@@ -8,8 +8,9 @@ A responsive, browser-only chatbot frontend based on the supplied template. It k
 - Suggested prompts and a new-chat action
 - Local chat history with search, open, and delete controls
 - Settings for the saved display name and clearing chat history
-- Multiple local file selections for DOCX, PPTX, Markdown, common CAD formats, and PCB design/export formats
+- Local file selection for DOCX, PPTX, Markdown, common CAD formats, and PCB design/export formats
 - File names shown in chat; file contents are not uploaded or analyzed until a backend is connected
+- Idle mascot animation with a laddoo, and a running hammer motion while a response is being prepared
 
 ## Run locally
 
