@@ -103,18 +103,19 @@
 
     .mascot-motion { position: absolute; z-index: 5; inset: 0; overflow: visible; border-radius: inherit; pointer-events: none; }
     .mascot-character { position: absolute; left: 57px; top: -8px; width: 66px; height: 72px; }
-    .ganesha-svg { display: block; width: 66px; height: 72px; overflow: visible; filter: drop-shadow(0 2px 3px rgba(0,0,0,.46)); }
-    .runner-body { transform-origin: 40px 57px; }
+    .ganesha-svg { display: block; width: 66px; height: 72px; overflow: visible; shape-rendering: crispEdges; image-rendering: pixelated; }
+    .runner-body { transform-origin: 16px 28px; transform-box: view-box; }
     .mascot-motion[data-state="idle"] .runner-body { animation: ganesha-idle 2.2s ease-in-out infinite; }
-    .mascot-motion[data-state="idle"] .arm-eat { transform-box: view-box; transform-origin: 52px 43px; animation: eat-arm 2.2s ease-in-out infinite; }
-    .mascot-motion[data-state="idle"] .laddu { transform-box: view-box; transform-origin: 61px 45px; animation: eat-laddu 2.2s ease-in-out infinite; }
+    .mascot-motion[data-state="idle"] .arm-eat { transform-box: view-box; transform-origin: 21px 20px; animation: eat-arm 2.2s ease-in-out infinite; }
+    .mascot-motion[data-state="idle"] .laddu { transform-box: view-box; transform-origin: 26px 21px; animation: eat-laddu 2.2s ease-in-out infinite; }
     .mascot-motion[data-state="working"] .mascot-character { animation: run-across .9s linear infinite alternate; }
     .mascot-motion[data-state="working"] .runner-body { animation: running-bounce .22s steps(2,end) infinite; }
-    .mascot-motion[data-state="working"] .leg-front { transform-box: view-box; transform-origin: 44px 56px; animation: stride-front .22s ease-in-out infinite alternate; }
-    .mascot-motion[data-state="working"] .leg-back { transform-box: view-box; transform-origin: 35px 56px; animation: stride-back .22s ease-in-out infinite alternate; }
-    .mascot-motion[data-state="working"] .arm-tool { transform-box: view-box; transform-origin: 26px 43px; animation: tool-arm .22s ease-in-out infinite alternate; }
-    .mascot-motion[data-state="working"] .hammer { transform-box: view-box; transform-origin: 14px 51px; animation: hammer-swing .17s ease-in-out infinite alternate; }
-    .mascot-motion[data-state="working"] .arm-eat { transform-box: view-box; transform-origin: 51px 43px; animation: run-arm .22s ease-in-out infinite alternate; }
+    .mascot-motion[data-state="working"] .leg-front { transform-box: view-box; transform-origin: 18px 29px; animation: stride-front .22s ease-in-out infinite alternate; }
+    .mascot-motion[data-state="working"] .leg-back { transform-box: view-box; transform-origin: 14px 29px; animation: stride-back .22s ease-in-out infinite alternate; }
+    .mascot-motion[data-state="working"] .arm-tool { transform-box: view-box; transform-origin: 11px 20px; animation: tool-arm .22s ease-in-out infinite alternate; }
+    .working-hammer { display: none; transform-box: view-box; transform-origin: 5px 8px; }
+    .mascot-motion[data-state="working"] .working-hammer { display: block; animation: hammer-swing .17s steps(2,end) infinite alternate; }
+    .mascot-motion[data-state="working"] .arm-eat { transform-box: view-box; transform-origin: 21px 20px; animation: run-arm .22s ease-in-out infinite alternate; }
     .mascot-motion[data-state="working"] .laddu { display: none; }
     @keyframes ganesha-idle { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-3px) rotate(1deg); } }
     @keyframes eat-arm { 0%,20%,100% { transform: rotate(0); } 45%,70% { transform: rotate(88deg); } }
@@ -129,7 +130,7 @@
     .chat-dock .message { position: relative; z-index: 2; padding-left: 72px; }
     .chat-dock .attach, .chat-dock .send { position: relative; z-index: 6; }
     @media (max-width: 560px) { .mascot-character { left: 50px; width: 58px; height: 66px; } .ganesha-svg { width:58px; height:66px; } .chat-dock .message { padding-left: 64px; } @keyframes run-across { from { left: 50px; } to { left: calc(100% - 112px); } } }
-    @media (prefers-reduced-motion: reduce) { .runner-body, .mascot-character, .leg-front, .leg-back, .arm-tool, .arm-eat, .hammer, .laddu { animation-duration: 1.2s !important; animation-iteration-count: 1 !important; } }
+    @media (prefers-reduced-motion: reduce) { .runner-body, .mascot-character, .leg-front, .leg-back, .arm-tool, .arm-eat, .working-hammer, .laddu { animation-duration: 1.2s !important; animation-iteration-count: 1 !important; } }
   </style>
 </head>
 <body style="background:#000;color:#fff">
@@ -175,48 +176,46 @@
   <form class="chat-dock" aria-label="Send a message" autocomplete="off">
     <div class="mascot-motion" id="mascot-motion" data-state="idle" aria-hidden="true">
       <div class="mascot-character">
-        <svg class="ganesha-svg" viewBox="0 0 80 80" role="presentation">
+        <svg class="ganesha-svg" viewBox="0 0 32 36" shape-rendering="crispEdges" role="presentation">
           <g class="runner-body">
             <g class="legs">
-              <path class="leg leg-back" d="M34 55 29 64 22 69q-3 3 1 5h14l7-13" fill="#c96c40" stroke="#63301f" stroke-width="2.5" stroke-linejoin="round"/>
-              <path class="leg leg-front" d="M46 55 51 64 59 68q4 3 0 6H45l-8-12" fill="#e98752" stroke="#63301f" stroke-width="2.5" stroke-linejoin="round"/>
+              <path class="leg leg-back" d="M13 27h4v3h-2v2h-2v1H9v-1H8v-2h3v-1h2z" fill="#c85f35" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
+              <path class="leg leg-front" d="M18 27h3v2h2v2h3v2h-1v1h-7v-1h-1v-3h1z" fill="#ed8950" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
             </g>
-            <path class="torso" d="M27 40q13-8 26 0l5 17q-18 8-36 0z" fill="#df7c49" stroke="#63301f" stroke-width="2.7" stroke-linejoin="round"/>
-            <path d="M31 46q9 5 18 0M33 50q7 4 14 0" fill="none" stroke="#f5b276" stroke-width="1.5" stroke-linecap="round"/>
+            <path class="torso" d="M11 19h10v1h2v2h1v5h-2v2H10v-1H9v-7h2z" fill="#e77a45" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
+            <path d="M12 22h2v1h-2zm6 0h2v1h-2zm-5 3h6v1h-6z" fill="#f5b276"/>
             <g class="arm-tool">
-              <path d="M29 43q-8-3-11 4l-4 6" fill="none" stroke="#63301f" stroke-width="7" stroke-linecap="round"/>
-              <path d="M29 43q-8-3-11 4l-4 6" fill="none" stroke="#e98752" stroke-width="4.5" stroke-linecap="round"/>
-              <circle cx="14" cy="53" r="3.6" fill="#f0a268" stroke="#63301f" stroke-width="1.6"/>
-              <g class="hammer">
-                <path d="M14 51 9 30" stroke="#63301f" stroke-width="3.5" stroke-linecap="round"/>
-                <path d="M9 33 4 29l2-5 5 2 2-4 5 2-2 6-4 3z" fill="#d88b55" stroke="#63301f" stroke-width="2" stroke-linejoin="round"/>
-              </g>
+              <path d="M11 20H9v-1H7v2h2v2h3z" fill="#e98752" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
             </g>
             <g class="arm-eat">
-              <path d="M51 43q9-2 12 5l-5 4" fill="none" stroke="#63301f" stroke-width="7" stroke-linecap="round"/>
-              <path d="M51 43q9-2 12 5l-5 4" fill="none" stroke="#ee9a5e" stroke-width="4.5" stroke-linecap="round"/>
-              <circle cx="58" cy="48" r="3.5" fill="#f0a268" stroke="#63301f" stroke-width="1.5"/>
+              <path d="M21 20h2v1h2v2h-2v2h-3z" fill="#ed9a5e" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
+              <path d="M23 22h2v2h-2z" fill="#f0a268" stroke="#4c2118" stroke-width=".8"/>
               <g class="laddu">
-                <circle cx="61" cy="45" r="3.8" fill="#e8a344" stroke="#71351f" stroke-width="1.3"/>
-                <circle cx="60" cy="44" r=".7" fill="#fff0bd"/><circle cx="63" cy="46" r=".6" fill="#fff0bd"/>
+                <path d="M25 19h3v1h1v3h-1v1h-3v-1h-1v-3h1z" fill="#e7a345" stroke="#71351f" stroke-width=".8" stroke-linejoin="miter"/>
+                <path d="M26 20h1v1h-1zm2 2h1v1h-1z" fill="#fff0bd"/>
               </g>
             </g>
             <g class="head">
-              <path d="M27 23Q14 18 15 32q1 9 12 12l5-9z" fill="#e99058" stroke="#63301f" stroke-width="2.5"/>
-              <path d="M53 23q13-5 12 9-1 9-12 12l-5-9z" fill="#e99058" stroke="#63301f" stroke-width="2.5"/>
-              <path d="M29 24q0-9 11-10 11 1 11 10v13q-1 9-11 10-10-1-11-10z" fill="#ef9a5e" stroke="#63301f" stroke-width="2.5"/>
+              <path d="M10 9H8V8H6V9H5v1H4v5h1v2h2v1h3v-2h1V11h-1z" fill="#e88a53" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
+              <path d="M22 9h2V8h2v1h1v1h1v5h-1v2h-2v1h-3v-2h-1v-6h1z" fill="#e88a53" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
+              <path d="M11 7h10v1h2v2h1v6h-1v2h-2v1h-9v-1h-2v-2H9v-6h1V8h1z" fill="#f09a5e" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
               <g class="crown">
-                <path d="M30 23 32 16l5 2 3-10 4 10 5-2 2 7z" fill="#d99050" stroke="#63301f" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M33 19h14M31 23h18" stroke="#6a3422" stroke-width="1.4"/>
-                <circle cx="40" cy="15" r="2" fill="#f6bf70" stroke="#63301f" stroke-width="1.2"/>
+                <path d="M11 8V6h2V4h2V2h2v2h2v2h2v2z" fill="#d98c4e" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
+                <path d="M13 6h6v1h-6zm-1 2h8v1h-8z" fill="#f2b566"/>
+                <rect x="15" y="3" width="2" height="2" fill="#ffcd77" stroke="#4c2118" stroke-width=".5"/>
               </g>
-              <rect x="33" y="29" width="4" height="3" rx=".7" fill="#381b17"/><rect x="43" y="29" width="4" height="3" rx=".7" fill="#381b17"/>
-              <path d="M38 31q-1 8 1 13v5q0 4 4 3 4-2 1-5" fill="none" stroke="#63301f" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M38 31q-1 8 1 13v5q0 4 4 3 4-2 1-5" fill="none" stroke="#e98551" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M32 36l3 1M48 36l-3 1" stroke="#fff0d1" stroke-width="1.5" stroke-linecap="round"/>
+              <rect x="12" y="11" width="2" height="2" fill="#351a16"/><rect x="18" y="11" width="2" height="2" fill="#351a16"/>
+              <path d="M15 14h2v4h1v2h2v2h-1v1h-3v-1h-1v-2h-1v-4h1z" fill="#e77f4b" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
+              <path d="M15 15h1v4h1v2h2v1h-2v-1h-2v-2h-1v-3h1z" fill="#f3a267"/>
+              <path d="M11 16h2v1h-1v2h-2v-1h1zm9 0h2v2h1v1h-2v-2h-1z" fill="#fff0d1"/>
             </g>
           </g>
-        </svg>
+          <g class="working-hammer">
+            <path d="M4 8h3v14H6v1H4v-1H3v-2h1z" fill="#9b6339" stroke="#4c2118" stroke-width="1" stroke-linejoin="miter"/>
+            <path d="M0 4h3V3h3v1h4v2H9v2H7V7H4v2H2V7H0z" fill="#b9c1c7" stroke="#40231e" stroke-width="1" stroke-linejoin="miter"/>
+            <path d="M1 4h2v2H1zm5 0h3v1H6z" fill="#e0e3e5"/>
+            <path d="M5 10h1v9H5z" fill="#d69a58"/>
+          </g>        </svg>
       </div>
     </div>
     <button class="attach" id="attach-trigger" type="button" aria-label="Attach files" title="Attach files">

@@ -1,6 +1,6 @@
 # trinity.ai TypeScript frontend
 
-A responsive, browser-only chatbot frontend based on the supplied template. It keeps the original black-and-white palette, video backdrop, and quote and input animations. Its inline SVG mascot is a motion-ready interpretation of the uploaded orange character.
+A responsive, browser-only chatbot frontend based on the supplied template. It keeps the original black-and-white palette, video backdrop, and quote and input animations. The chat-bar mascot is a low-resolution inline SVG, styled with crisp pixel edges to match the uploaded orange character.
 
 ## Features
 
@@ -10,7 +10,7 @@ A responsive, browser-only chatbot frontend based on the supplied template. It k
 - Settings for the saved display name and clearing chat history
 - Local file selection for DOCX, PPTX, Markdown, common CAD formats, and PCB design/export formats
 - File names shown in chat; file contents are not uploaded or analyzed until a backend is connected
-- Idle motion raises a laddoo toward the character's trunk; while a reply is prepared, it runs across the bar with a swinging hammer and alternating legs
+- Idle motion raises and eats a laddoo; while a reply is prepared, the character runs across the bar with alternating legs and a recognizable swinging hammer
 
 ## Run locally
 
